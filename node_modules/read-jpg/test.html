@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="./dist/browser/read-jpg.browser.js"></script>
+  </head>
+  <body style="background: yellow;">
+    <script>
+        (async () => {
+          try {
+            const ab = await fetch("./test/flower.jpg").then(res => res.arrayBuffer());
+            await readJPG({ data: ab, debug: true });
+            await readJPG({ data: new Uint8Array(ab), debug: true });
+            document.body.style.background = "green";
+          } catch (error) {
+            console.error(error);
+            document.body.style.background = "red";
+          }
+        })()
+
+    </script>
+  </body>
+</html>
