@@ -3,23 +3,29 @@
 // Note: To convert to normalized xywh from pixel values, divide x (and width) by the image's width and divide y (and height) by the image's height.
 
 import readJPG from 'read-jpg';
-import * as fs from "node:fs/promises";
+import * as fs from 'fs/promises';
+import { createReadStream, createWriteStream } from 'fs';
 import toab from "toab";
 import { PNG } from 'pngjs';
 
 //Number for player label
 const PLAYER = 3;
 
-//Reads jpg file - adapted from the read-jpg page.
-async function readImage(fileName){
-    const buffer = await fs.readFile(fileName);
-    const arrayBuffer = await toab(buffer);
-    const image = await readJPG({
-        data: arrayBuffer,
-        debug: false
+async function readImage(fileName) {
+    // Return a new promise that will handle the asynchronous file reading and parsing
+    return new Promise((resolve, reject) => {
+        // Create a stream to read the file
+        createReadStream(fileName)
+            .pipe(new PNG()) // Pipe the file through the PNG parser
+            .on('parsed', function() {
+                // This event is emitted once the PNG has been fully parsed
+                console.log(`Image size: w:${this.width}; h:${this.height};`);
+                // Construct an object with the image's dimensions and a copy of its pixel data
+                const image = { width: this.width, height: this.height, pixels: new Uint8Array(this.data) };
+                resolve(image); // Resolve the promise with the image object
+            })
+            .on('error', reject); // If there's an error, reject the promise
     });
-    console.log(`Image size: w:${image.width}; h:${image.height};`);
-    return image;
 }
 
 /* Each label is four numbers x, y width and height
@@ -103,20 +109,6 @@ function getAverages(pixels3D){
     return [rAv/cntr, gAv/cntr, bAv/cntr, aAv/cntr];
 }
 
-// Saves the 3D array of pixels to a PNG file
-// Adapted from https://github.com/Lellansin/node-pnglib
-// #FIXME# DOES NOT WORK!
-// async function savePng(pixels3D){
-//     //Add pixels to PNG - this part breaks with 'node-pnglib: depth is not enough, set up it for more'
-//     let png = new PNGlib(pixels3D[0].length, pixels3D.length, 24);
-//     for(let y=0; y<pixels3D.length; ++y){
-//         for(let x=0; x<pixels3D[y].length; ++x){
-//             png.setPixel(x, y, `rgb(${pixels3D[y][x][0]}, ${pixels3D[y][x][1]}, ${pixels3D[y][x][2]})` );
-//         }
-//     }
-//     //Save PNG file
-//     await fs.writeFile('./Data/output/player.png', png.getBuffer());
-// }
 
 async function savePng(pixels3D) {
     // Create a new PNG
@@ -139,7 +131,7 @@ async function savePng(pixels3D) {
     }
 
     // Convert PNG to buffer and save
-    png.pack().pipe(fs.createWriteStream('./Data/output/player.png'));
+    png.pack().pipe(createWriteStream('./Data/output/player.png'));
 }
 
 //Converts RGBA to hex color, for example, #330fa3
@@ -160,8 +152,8 @@ function getHex(rVal, gVal, bVal){
 }
 
 //Should test these separately
-savePng();
+// savePng();
 //console.log(getHex(33, 255, 12));
 
-//Calls main method to process players and labels
+// process players and labels
 processPlayers("./Data/images/Full-Match-PERSIJA_Jakarta_VS_PSS_Sleman_frame14760_png.rf.ca72912b733ecf834bf43aaed0a56d2a.png", "Data/labels/Full-Match-PERSIJA_Jakarta_VS_PSS_Sleman_frame14760_png.rf.ca72912b733ecf834bf43aaed0a56d2a.txt");
