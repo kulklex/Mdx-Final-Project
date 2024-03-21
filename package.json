@@ -10,9 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "jimp": "^0.22.12",
     "node-pnglib": "^1.5.5",
     "pngjs": "^7.0.0",
     "ppm": "^0.0.0",
-    "read-jpg": "^0.0.2"
+    "read-jpg": "^0.0.2",
+    "sharp": "^0.33.2"
   }
 }

@@ -7,6 +7,10 @@ import * as fs from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
 import toab from "toab";
 import { PNG } from 'pngjs';
+import util from 'util';
+
+
+const writeFile = util.promisify(fs.writeFile);
 
 //Number for player label
 const PLAYER = 3;
@@ -74,7 +78,7 @@ async function processPlayers(imageFileName, labelFileName){
             console.log(`rAv:${rAv}; gAv:${gAv}; bAv:${bAv}; aAv:${aAv}`);
             if(rAv > gAv && rAv > bAv){
                 //Fix this method to see if the pixels are correct
-                await savePng(selectedPixels);
+                await savePpm(selectedPixels);
             }
         }
     }
@@ -115,10 +119,10 @@ async function savePng(pixels3D) {
     const png = new PNG({
         width: pixels3D[0].length,
         height: pixels3D.length,
-        filterType: -1, // No filtering
+        filterType: -1,
     });
 
-    // Fill the PNG with your pixel data
+    // Fill the PNG with pixel data
     for (let y = 0; y < pixels3D.length; y++) {
         for (let x = 0; x < pixels3D[y].length; x++) {
             const idx = (png.width * y + x) << 2; // << 2 is equivalent to * 4
@@ -132,6 +136,29 @@ async function savePng(pixels3D) {
 
     // Convert PNG to buffer and save
     png.pack().pipe(createWriteStream('./Data/output/player.png'));
+}
+
+async function savePpm(pixels3D) {
+    // Define the header for a PPM file
+    const header = `P3\n${pixels3D[0].length} ${pixels3D.length}\n255\n`;
+    
+    // Initialize an array to hold the pixel data strings
+    let pixelData = [];
+
+    for (let y = 0; y < pixels3D.length; y++) {
+        for (let x = 0; x < pixels3D[y].length; x++) {
+            const pixel = pixels3D[y][x];
+            // Append the RGB components to the pixel data, ignoring Alpha if present
+            pixelData.push(`${pixel[0]} ${pixel[1]} ${pixel[2]}`);
+        }
+    }
+    console.log("Pixel Data: ", pixelData)
+
+    // Join all pixel data strings with whitespace and append to the header
+    const ppmData = header + pixelData.join(' ') + '\n';
+
+    // Save the PPM data to a file
+    await writeFile('./Data/output/player.ppm', ppmData, 'utf8');
 }
 
 //Converts RGBA to hex color, for example, #330fa3
@@ -157,3 +184,9 @@ function getHex(rVal, gVal, bVal){
 
 // process players and labels
 processPlayers("./Data/images/Full-Match-PERSIJA_Jakarta_VS_PSS_Sleman_frame14760_png.rf.ca72912b733ecf834bf43aaed0a56d2a.png", "Data/labels/Full-Match-PERSIJA_Jakarta_VS_PSS_Sleman_frame14760_png.rf.ca72912b733ecf834bf43aaed0a56d2a.txt");
+
+
+
+// GET AN 2D ARRAY OF PIXELS
+// SO THERE IS X AN Y VALUES THAT POINT 3, 4 NUMBERS
+// TO TEST THAT SAVE AN IMAGE USING THE ARRAY 
