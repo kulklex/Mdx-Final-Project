@@ -1,12 +1,12 @@
 import { PNG } from 'pngjs';
 import fs from 'fs';
 
-// Replace 'path/to/image.png' with the path to your PNG image
-const imageFilePath = 'path/to/image.png';
-const outputFilePath = 'path/to/output.png'; // Path to save the cropped image
+
+const imageFilePath = './Data/images/Artificial-ball-pitch.png';
+const outputFilePath = './Data/output/process_BALL.png';
 
 // Simulated label data for the part of the image you're interested in
-const cropArea = { x: 100, y: 50, width: 200, height: 150 }; // Example crop area
+const cropArea = { x: 10, y: 10, width: 20, height: 25 }; // Example crop area
 
 function readImage(filePath) {
     return new Promise((resolve, reject) => {
@@ -17,6 +17,31 @@ function readImage(filePath) {
             })
             .on('error', reject);
     });
+}
+
+function analyzeImage(image, cropArea) {
+    let { x, y, width, height } = cropArea;
+    let rSum = 0, gSum = 0, bSum = 0, count = 0;
+
+    for (let dy = 0; dy < height; dy++) {
+        for (let dx = 0; dx < width; dx++) {
+            let idx = ((y + dy) * image.width + (x + dx)) << 2;
+            rSum += image.data[idx];
+            gSum += image.data[idx + 1];
+            bSum += image.data[idx + 2];
+            count++;
+        }
+    }
+
+    console.log("height: ", image.height)
+    console.log("width: ", image.width)
+    let averageColor = {
+        r: Math.round(rSum / count),
+        g: Math.round(gSum / count),
+        b: Math.round(bSum / count)
+    };
+
+    return averageColor;
 }
 
 function saveCroppedImage(image, cropArea, outputFilePath) {
@@ -30,6 +55,8 @@ function saveCroppedImage(image, cropArea, outputFilePath) {
 async function processAndSaveCroppedImage(filePath, cropArea, outputFilePath) {
     try {
         const image = await readImage(filePath);
+        const averageColor = analyzeImage(image, cropArea);
+        console.log('Average Color:', averageColor);
         saveCroppedImage(image, cropArea, outputFilePath);
         console.log('Cropped image saved to:', outputFilePath);
     } catch (error) {
