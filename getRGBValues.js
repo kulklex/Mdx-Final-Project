@@ -24,6 +24,6 @@ async function calculateAverageRGB(imagePath) {
     }
 }
 
-// calculateAverageRGB('./Data/images/scenario-red.png');
+calculateAverageRGB('./Data/images/scenario-red.png');
 // calculateAverageRGB('./Data/images/scenario-yellow.png');
 calculateAverageRGB('./Data/images/scenario-blue.png');
