@@ -67,7 +67,8 @@ async function readImage(filePath) {
 function quantizeColor(color) {
     // Reduce the color space by dividing the RGB values by 32 and rounding the result
     return { r: Math.round(color.r / 32), g: Math.round(color.g / 32), b: Math.round(color.b / 32) };
-}
+};
+
 
 // Calculates the average color within a cell of the image
 function calculateCellAverageColor(image, cellX, cellY, cellWidth, cellHeight) {
