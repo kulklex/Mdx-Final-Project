@@ -5,7 +5,7 @@ import fs from 'fs';
 // Define the sequence of image file paths
 const imageFilePaths = [
     './Data/images/scenario11.png',
-    './Data/images/scenario22.png'
+    './Data/images/scenario33.png'
 ];
 
 // Asynchronously reads and parses an image file into a usable PNG object
@@ -260,15 +260,12 @@ function compareFramesForOffside(previousFrameData, currentFrameData) {
     // If the same player retains possession from the previous frame to the current frame.
     if (playerInPossessionPreviousFrame === playerInPossessionCurrentFrame) {
         console.log("Same player retains the possession from the previous frame")
-        // Not offside if the player was already in possession and crossed the defender with the ball.
-        if (previousPlayerX <= defenderX || currentPlayerX <= defenderX) {
-            return false; // The player is either behind or in line with the last defender, thus not offside.
-        }
+        return false
     } else {
         // If there's a new player in possession, indicating a pass.
         console.log("New player has possession in current frame")
         // If
-        if (previousPlayerX <= ballXAtPass && currentPlayerX >= ballXAtPass && currentPlayerX <= ballXAfterPass) {  
+        if (previousPlayerX <= ballXAtPass && currentPlayerX) {  
             return true;
         }
     }

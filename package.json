@@ -1,11 +1,10 @@
 {
   "name": "footballdataannotationcode",
   "version": "1.0.0",
-  "description": "",
   "type": "module",
   "main": "ProcessImages.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",
@@ -16,5 +15,12 @@
     "ppm": "^0.0.0",
     "read-jpg": "^0.0.2",
     "sharp": "^0.33.2"
-  }
+  },
+  "devDependencies": {
+    "chai": "^5.1.0",
+    "mocha": "^10.4.0",
+    "sinon": "^17.0.1"
+  },
+  "keywords": [],
+  "description": ""
 }

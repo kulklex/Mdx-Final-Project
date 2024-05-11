@@ -6,9 +6,9 @@ import Jimp from 'jimp';
 
 // Images for each target
 const referenceImagePaths = {
-    team1: './Data/images/scenario-red.png',
-    team2: './Data/images/scenario-yellow.png',
-    ball: './Data/images/scenario-blue.png'
+    team1: './Data/evaluation/player3.png',
+    team2: './Data/evaluation/player2.png',
+    ball: './Data/evaluation/ball.png'
 };
 
 // Function to calculate the average RGB color of an image
@@ -45,8 +45,8 @@ async function setTargetColors() {
 
 // Define the sequence of image file paths
 const imageFilePaths = [
-    './Data/images/scenario11.png',
-    './Data/images/scenario33.png'
+    './Data/evaluation/caseH.png',
+    './Data/evaluation/caseC.png'
 ];
 
 
@@ -85,7 +85,7 @@ function calculateCellAverageColor(image, cellX, cellY, cellWidth, cellHeight) {
     }
     // Return the average color of the cell
     return { r: rSum / count, g: gSum / count, b: bSum / count };
-}
+};
 
 // Function to create a classification grid for the image based on target colors
 function createGridClassification(image, squareSize, targetColors) {
@@ -173,7 +173,7 @@ function calculateDistance(x1, y1, x2, y2) {
 
 // Function to extract frame data, including identifying the player closest to the ball and the first attacking player
 function extractFrameData(playersAndObjects) {
-    let frameData = { team1: [], team2: null, ball: null, playerInPossession: null };
+    let frameData = { team1: [], team2: null, ball: null, playerInPossession: null, };
     
 
     // Extract player positions and the ball from the detected objects
@@ -286,7 +286,7 @@ function compareFramesForOffside(previousFrameData, currentFrameData) {
 
     currentFrameData.team1.forEach(player => {
         const distance = calculateDistance(
-            player.x + player.width / 2, player.y + player.height / 2, // Player's center position
+            player.x + player.width / 2, player.y + player.height / 2, 
             currentFrameData.ball.x + currentFrameData.ball.width / 2, currentFrameData.ball.y + currentFrameData.ball.height / 2 // Ball's center position
         );
 
@@ -311,19 +311,18 @@ function compareFramesForOffside(previousFrameData, currentFrameData) {
     const playerInPossessionPreviousFrame =  previousFrameData.playerInPossession.firstAttackingPlayer;
     const playerInPossessionCurrentFrame =  currentFrameData.playerInPossession.firstAttackingPlayer;
 
-    
+    console.log("Player in possession Frame 1: ", playerInPossessionPreviousFrame)
+    console.log("\nPlayer in possession Frame 2: ", playerInPossessionCurrentFrame)   
+
     // If the same player retains possession from the previous frame to the current frame.
     if (playerInPossessionPreviousFrame === playerInPossessionCurrentFrame) {
         console.log("Same player retains the possession from the previous frame")
-        // Not offside if the player was already in possession and crossed the defender with the ball.
-        if (previousPlayerX <= defenderX || currentPlayerX <= defenderX) {
-            return false; // The player is either behind or in line with the last defender, thus not offside.
-        }
+        return false
     } else {
         // If there's a new player in possession, indicating a pass.
         console.log("New player has possession in current frame")
         // It's offside if the second attacking player receives the ball and is ahead of the last defender
-        if (previousPlayerX <= ballXAtPass && currentPlayerX >= ballXAtPass && currentPlayerX <= ballXAfterPass) {  
+        if (previousPlayerX <= ballXAtPass && currentPlayerX >= ballXAtPass) {  
             return true;
         }
     }
@@ -354,7 +353,9 @@ async function analyzeOffsideScenarios(imageFilePaths, squareSize = 10) {
 
 
 
-
 analyzeOffsideScenarios(imageFilePaths)
     .then(() => console.log("Completed offside analysis."))
     .catch(error => console.error("An error occurred during analysis:", error));
+
+
+
